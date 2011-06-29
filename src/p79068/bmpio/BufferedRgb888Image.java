@@ -14,6 +14,7 @@ public final class BufferedRgb888Image implements Rgb888Image {
 	public BufferedRgb888Image(int width, int height) {
 		this.width = width;
 		this.height = height;
+		pixels = new int[width * height];
 	}
 	
 	
