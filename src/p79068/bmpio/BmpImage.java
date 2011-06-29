@@ -11,8 +11,7 @@ public final class BmpImage {
 	
 	
 	
-	public BmpImage(Rgb888Image image) {
-		this.image = image;
+	public BmpImage() {
 		horizontalResolution = 3780;  // 96 DPI
 		verticalResolution = 3780;  // 96 DPI
 	}

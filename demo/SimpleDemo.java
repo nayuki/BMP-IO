@@ -41,7 +41,8 @@ public class SimpleDemo {
 			}
 		};
 		
-		BmpImage bmp = new BmpImage(image);
+		BmpImage bmp = new BmpImage();
+		bmp.image = image;
 		FileOutputStream out = new FileOutputStream(file);
 		BmpWriter.write(out, bmp);
 		out.close();
