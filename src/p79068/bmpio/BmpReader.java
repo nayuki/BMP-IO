@@ -40,7 +40,9 @@ public final class BmpReader {
 		for (int y = height - 1; y >= 0; y--) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++) {
-				int color = (row[x * bpp + 2] & 0xFF) << 16 | (row[x * bpp + 1] & 0xFF) << 8 | (row[x * bpp] & 0xFF);
+				int color =   (row[x * bpp + 2] & 0xFF) << 16
+				            | (row[x * bpp + 1] & 0xFF) <<  8
+				            | (row[x * bpp + 0] & 0xFF) <<  0;
 				image.setRgb888Pixel(x, y, color);
 			}
 		}
