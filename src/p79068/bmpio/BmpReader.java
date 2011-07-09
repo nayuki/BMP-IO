@@ -20,7 +20,8 @@ public final class BmpReader {
 		int height = readInt32(in);
 		if (readInt16(in) != 1)  // Planes
 			throw new RuntimeException();
-		if (readInt16(in) != 32)  // BitsPerPixel
+		int bpp = readInt16(in);  // BitsPerPixel
+		if (bpp != 24 && bpp != 32)
 			throw new RuntimeException();
 		if (readInt32(in) != 0)  // Compression
 			throw new RuntimeException();
@@ -34,11 +35,12 @@ public final class BmpReader {
 		bmp.verticalResolution   = readInt32(in);
 		skipFully(in, 8);
 		
-		byte[] row = new byte[width * 4];
+		bpp /= 8;  // Now bpp is bytes per pixel
+		byte[] row = new byte[(width * bpp + 3) / 4 * 4];
 		for (int y = height - 1; y >= 0; y--) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++) {
-				int color = (row[x * 4 + 2] & 0xFF) << 16 | (row[x * 4 + 1] & 0xFF) << 8 | (row[x * 4] & 0xFF);
+				int color = (row[x * bpp + 2] & 0xFF) << 16 | (row[x * bpp + 1] & 0xFF) << 8 | (row[x * bpp] & 0xFF);
 				image.setRgb888Pixel(x, y, color);
 			}
 		}
