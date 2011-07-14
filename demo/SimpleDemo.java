@@ -5,7 +5,7 @@ import java.io.IOException;
 import p79068.bmpio.*;
 
 
-public class SimpleDemo {
+public final class SimpleDemo {
 	
 	public static void main(String[] args) throws IOException {
 		File file = new File("Demo.bmp");
