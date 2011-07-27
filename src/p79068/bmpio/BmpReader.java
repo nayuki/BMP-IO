@@ -49,7 +49,7 @@ public final class BmpReader {
 			if (compression != 0)
 				throw new RuntimeException("Unsupported compression: " + compression);
 			
-			if (bitsPerPixel == 4 || bitsPerPixel == 8) {
+			if (bitsPerPixel == 1 || bitsPerPixel == 4 || bitsPerPixel == 8) {
 				if (colorsUsed == 0)
 					colorsUsed = 1 << bitsPerPixel;
 				if (colorsUsed > 1 << bitsPerPixel)
@@ -88,7 +88,9 @@ public final class BmpReader {
 				palette[i] = (entry[2] & 0xFF) << 16 | (entry[1] & 0xFF) << 8 | (entry[0] & 0xFF);
 			}
 			
-			if (bitsPerPixel == 4)
+			if (bitsPerPixel == 1)
+				bmp.image = readRgb1Image(in, width, height, bitsPerPixel, palette);
+			else if (bitsPerPixel == 4)
 				bmp.image = readRgb4Image(in, width, height, bitsPerPixel, palette);
 			else if (bitsPerPixel == 8)
 				bmp.image = readRgb8Image(in, width, height, bitsPerPixel, palette);
@@ -136,6 +138,18 @@ public final class BmpReader {
 			readFully(in, row);
 			for (int x = 0; x < width; x++)
 				image.setRgb888Pixel(x, y, (byte)(row[x / 2] >>> (1 - x % 2) * 4 & 0xF));
+		}
+		return image;
+	}
+	
+	
+	private static Rgb888Image readRgb1Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
+		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
+		byte[] row = new byte[(width + 31) / 32 * 4];
+		for (int y = height - 1; y >= 0; y--) {
+			readFully(in, row);
+			for (int x = 0; x < width; x++)
+				image.setRgb888Pixel(x, y, (byte)(row[x / 8] >>> (7 - x % 8) & 1));
 		}
 		return image;
 	}
