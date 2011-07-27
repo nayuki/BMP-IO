@@ -22,6 +22,7 @@ public final class BmpReader {
 		int height;
 		int bitsPerPixel;
 		int imageSize;
+		int colorsUsed;
 		if (headerSize == 40) {
 			width  = readInt32(in);
 			height = readInt32(in);
@@ -31,7 +32,7 @@ public final class BmpReader {
 			imageSize = readInt32(in);
 			bmp.horizontalResolution = readInt32(in);
 			bmp.verticalResolution   = readInt32(in);
-			int colorsUsed = readInt32(in);
+			colorsUsed = readInt32(in);
 			int colorsImportant = readInt32(in);
 			
 			if (width <= 0)
@@ -40,29 +41,58 @@ public final class BmpReader {
 				throw new RuntimeException("Invalid height: " + height);
 			if (planes != 1)
 				throw new RuntimeException("Unsupported planes: " + planes);
-			if (bitsPerPixel != 24 && bitsPerPixel != 32)
-				throw new RuntimeException("Unsupported bits per pixel: " + bitsPerPixel);
-			if (imageSize != (width * bitsPerPixel / 8 + 3) / 4 * 4 * height)
-				throw new RuntimeException("Invalid image size: " + imageSize);
 			if (compression != 0)
 				throw new RuntimeException("Unsupported compression: " + compression);
-			if (colorsUsed != 0)
-				throw new RuntimeException("Invalid colors used: " + colorsUsed);
-			if (colorsImportant != 0)
-				throw new RuntimeException("Invalid important colors: " + colorsImportant);
+			
+			if (bitsPerPixel == 8) {
+				if (colorsUsed == 0)
+					colorsUsed = 1 << bitsPerPixel;
+				if (colorsUsed > 1 << bitsPerPixel)
+					throw new RuntimeException("Invalid colors used: " + colorsUsed);
+				
+			} else if (bitsPerPixel == 24 || bitsPerPixel == 32) {
+				if (colorsUsed != 0)
+					throw new RuntimeException("Invalid colors used: " + colorsUsed);
+				if (colorsImportant != 0)
+					throw new RuntimeException("Invalid important colors: " + colorsImportant);
+				
+			} else
+				throw new RuntimeException("Unsupported bits per pixel: " + bitsPerPixel);
+			
+			if (imageSize != (width * bitsPerPixel / 8 + 3) / 4 * 4 * height)
+				throw new RuntimeException("Invalid image size: " + imageSize);
 			
 		} else
 			throw new RuntimeException("Unsupported BMP header format: " + headerSize + " bytes");
 		
-		if (14 + headerSize > imageDataOffset)
+		if (14 + headerSize + 4 * colorsUsed > imageDataOffset)
 			throw new RuntimeException("Invalid image data offset: " + imageDataOffset);
 		if (imageDataOffset + imageSize > fileSize)
 			throw new RuntimeException("Invalid file size: " + fileSize);
 		
-		BufferedRgb888Image image = new BufferedRgb888Image(width, height);
-		bmp.image = image;
-		
 		// Read the image data
+		if (bitsPerPixel == 24 || bitsPerPixel == 32)
+			bmp.image = readRgb24Or32Image(in, width, height, bitsPerPixel);
+		
+		else if (bitsPerPixel == 8) {
+			int[] palette = new int[colorsUsed];
+			for (int i = 0; i < colorsUsed; i++) {
+				byte[] entry = new byte[4];
+				readFully(in, entry);
+				palette[i] = (entry[2] & 0xFF) << 16 | (entry[1] & 0xFF) << 8 | (entry[0] & 0xFF);
+			}
+			
+			bmp.image = readRgb8Image(in, width, height, bitsPerPixel, palette);
+			
+		} else
+			throw new AssertionError();
+		
+		return bmp;
+	}
+	
+	
+	private static Rgb888Image readRgb24Or32Image(InputStream in, int width, int height, int bitsPerPixel) throws IOException {
+		BufferedRgb888Image image = new BufferedRgb888Image(width, height);
 		int bytesPerPixel = bitsPerPixel / 8;
 		byte[] row = new byte[(width * bytesPerPixel + 3) / 4 * 4];
 		for (int y = height - 1; y >= 0; y--) {
@@ -74,8 +104,20 @@ public final class BmpReader {
 				image.setRgb888Pixel(x, y, color);
 			}
 		}
-		
-		return bmp;
+		return image;
+	}
+	
+	
+	private static Rgb888Image readRgb8Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
+		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
+		int bytesPerPixel = bitsPerPixel / 8;
+		byte[] row = new byte[(width * bytesPerPixel + 3) / 4 * 4];
+		for (int y = height - 1; y >= 0; y--) {
+			readFully(in, row);
+			for (int x = 0; x < width; x++)
+				image.setRgb888Pixel(x, y, row[x]);
+		}
+		return image;
 	}
 	
 	
