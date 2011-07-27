@@ -53,12 +53,12 @@ public final class BmpReader {
 			} else if (bitsPerPixel == 24 || bitsPerPixel == 32) {
 				if (colorsUsed != 0)
 					throw new RuntimeException("Invalid colors used: " + colorsUsed);
-				if (colorsImportant != 0)
-					throw new RuntimeException("Invalid important colors: " + colorsImportant);
 				
 			} else
 				throw new RuntimeException("Unsupported bits per pixel: " + bitsPerPixel);
 			
+			if (colorsImportant < 0 || colorsImportant > colorsUsed)
+				throw new RuntimeException("Invalid important colors: " + colorsImportant);
 			if (imageSize != (width * bitsPerPixel / 8 + 3) / 4 * 4 * height)
 				throw new RuntimeException("Invalid image size: " + imageSize);
 			
