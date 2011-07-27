@@ -16,13 +16,13 @@ public final class BmpWriter {
 		int imageSize = rowSize * height;
 		
 		// BITMAPFILEHEADER
-		out1.writeBytes(new byte[]{'B', 'M'}, 0, 2);   // FileType
-		out1.writeInt32(14 + 40 + imageSize);          // FileSize
-		out1.writeInt16(0);                            // Reserved1
-		out1.writeInt16(0);                            // Reserved2
-		out1.writeInt32(14 + 40);                      // BitmapOffset
+		out1.writeBytes(new byte[]{'B', 'M'}, 0, 2);  // FileType
+		out1.writeInt32(14 + 40 + imageSize);         // FileSize
+		out1.writeInt16(0);                           // Reserved1
+		out1.writeInt16(0);                           // Reserved2
+		out1.writeInt32(14 + 40);                     // BitmapOffset
 		
-		// BITMAPINFOV3HEADER
+		// BITMAPINFOHEADER
 		out1.writeInt32(40);                        // Size
 		out1.writeInt32(width);                     // Width
 		out1.writeInt32(height);                    // Height
@@ -35,6 +35,7 @@ public final class BmpWriter {
 		out1.writeInt32(0);                         // ColorsUsed
 		out1.writeInt32(0);                         // ColorsImportant
 		
+		// Image data
 		byte[] row = new byte[rowSize];
 		for (int y = height - 1; y >= 0; y--) {
 			for (int x = 0; x < width; x++) {
