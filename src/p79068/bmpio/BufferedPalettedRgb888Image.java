@@ -40,7 +40,7 @@ public final class BufferedPalettedRgb888Image implements Rgb888Image {
 	
 	
 	public void setRgb888Pixel(int x, int y, byte colorIndex) {
-		if (x < 0 || x >= width || y < 0 || y >= height)
+		if (x < 0 || x >= width || y < 0 || y >= height || (colorIndex & 0xFF) > palette.length)
 			throw new IndexOutOfBoundsException();
 		pixels[y * width + x] = colorIndex;
 	}
