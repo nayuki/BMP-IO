@@ -88,14 +88,7 @@ public final class BmpReader {
 				palette[i] = (entry[2] & 0xFF) << 16 | (entry[1] & 0xFF) << 8 | (entry[0] & 0xFF);
 			}
 			
-			if (bitsPerPixel == 1)
-				bmp.image = readRgb1Image(in, width, height, bitsPerPixel, palette);
-			else if (bitsPerPixel == 4)
-				bmp.image = readRgb4Image(in, width, height, bitsPerPixel, palette);
-			else if (bitsPerPixel == 8)
-				bmp.image = readRgb8Image(in, width, height, bitsPerPixel, palette);
-			else
-				throw new AssertionError();
+			bmp.image = readPalettedImage(in, width, height, bitsPerPixel, palette);
 		}
 		
 		return bmp;
@@ -119,37 +112,18 @@ public final class BmpReader {
 	}
 	
 	
-	private static Rgb888Image readRgb8Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
+	private static Rgb888Image readPalettedImage(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
 		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
-		byte[] row = new byte[(width + 3) / 4 * 4];
+		byte[] row = new byte[(width * bitsPerPixel + 31) / 32 * 4];
+		int pixelsPerByte = 8 / bitsPerPixel;
+		int mask = (1 << bitsPerPixel) - 1;
 		for (int y = height - 1; y >= 0; y--) {
 			readFully(in, row);
-			for (int x = 0; x < width; x++)
-				image.setRgb888Pixel(x, y, row[x]);
-		}
-		return image;
-	}
-	
-	
-	private static Rgb888Image readRgb4Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
-		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
-		byte[] row = new byte[(width + 7) / 8 * 4];
-		for (int y = height - 1; y >= 0; y--) {
-			readFully(in, row);
-			for (int x = 0; x < width; x++)
-				image.setRgb888Pixel(x, y, (byte)(row[x / 2] >>> (1 - x % 2) * 4 & 0xF));
-		}
-		return image;
-	}
-	
-	
-	private static Rgb888Image readRgb1Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
-		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
-		byte[] row = new byte[(width + 31) / 32 * 4];
-		for (int y = height - 1; y >= 0; y--) {
-			readFully(in, row);
-			for (int x = 0; x < width; x++)
-				image.setRgb888Pixel(x, y, (byte)(row[x / 8] >>> (7 - x % 8) & 1));
+			for (int x = 0; x < width; x++) {
+				int index = x / pixelsPerByte;
+				int shift = (pixelsPerByte - 1 - x % pixelsPerByte) * bitsPerPixel;
+				image.setRgb888Pixel(x, y, (byte)(row[index] >>> shift & mask));
+			}
 		}
 		return image;
 	}
