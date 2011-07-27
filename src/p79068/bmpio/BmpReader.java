@@ -9,31 +9,36 @@ public final class BmpReader {
 	
 	public static BmpImage read(InputStream in) throws IOException {
 		// BITMAPFILEHEADER (14 bytes)
+		int fileSize;
+		int imageDataOffset;
 		if (readInt16(in) != 0x4D42)  // "BM"
 			throw new RuntimeException("Invalid BMP signature");
-		int fileSize = readInt32(in);
+		fileSize = readInt32(in);
 		skipFully(in, 4);  // Skip reserved
-		int imageDataOffset = readInt32(in);
+		imageDataOffset = readInt32(in);
 		
 		// BITMAPINFOHEADER
-		BmpImage bmp = new BmpImage();
 		int headerSize = readInt32(in);
 		int width;
 		int height;
 		int bitsPerPixel;
 		int imageSize;
 		int colorsUsed;
+		BmpImage bmp = new BmpImage();
 		if (headerSize == 40) {
+			int planes;
+			int compression;
+			int colorsImportant;
 			width  = readInt32(in);
 			height = readInt32(in);
-			int planes = readInt16(in);
+			planes = readInt16(in);
 			bitsPerPixel = readInt16(in);
-			int compression = readInt32(in);
+			compression = readInt32(in);
 			imageSize = readInt32(in);
 			bmp.horizontalResolution = readInt32(in);
 			bmp.verticalResolution   = readInt32(in);
 			colorsUsed = readInt32(in);
-			int colorsImportant = readInt32(in);
+			colorsImportant = readInt32(in);
 			
 			if (width <= 0)
 				throw new RuntimeException("Invalid width: " + width);
@@ -65,6 +70,7 @@ public final class BmpReader {
 		} else
 			throw new RuntimeException("Unsupported BMP header format: " + headerSize + " bytes");
 		
+		// Some more checks
 		if (14 + headerSize + 4 * colorsUsed > imageDataOffset)
 			throw new RuntimeException("Invalid image data offset: " + imageDataOffset);
 		if (imageDataOffset + imageSize > fileSize)
@@ -74,7 +80,7 @@ public final class BmpReader {
 		if (bitsPerPixel == 24 || bitsPerPixel == 32)
 			bmp.image = readRgb24Or32Image(in, width, height, bitsPerPixel);
 		
-		else if (bitsPerPixel == 4 || bitsPerPixel == 8) {
+		else {
 			int[] palette = new int[colorsUsed];
 			for (int i = 0; i < colorsUsed; i++) {
 				byte[] entry = new byte[4];
@@ -88,9 +94,7 @@ public final class BmpReader {
 				bmp.image = readRgb8Image(in, width, height, bitsPerPixel, palette);
 			else
 				throw new AssertionError();
-			
-		} else
-			throw new AssertionError();
+		}
 		
 		return bmp;
 	}
@@ -115,8 +119,7 @@ public final class BmpReader {
 	
 	private static Rgb888Image readRgb8Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
 		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
-		int bytesPerPixel = bitsPerPixel / 8;
-		byte[] row = new byte[(width * bytesPerPixel + 3) / 4 * 4];
+		byte[] row = new byte[(width + 3) / 4 * 4];
 		for (int y = height - 1; y >= 0; y--) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++)
@@ -128,7 +131,7 @@ public final class BmpReader {
 	
 	private static Rgb888Image readRgb4Image(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
 		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
-		byte[] row = new byte[(width * 4 + 31) / 32 * 4];
+		byte[] row = new byte[(width + 7) / 8 * 4];
 		for (int y = height - 1; y >= 0; y--) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++)
