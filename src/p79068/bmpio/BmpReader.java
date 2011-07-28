@@ -24,7 +24,6 @@ public final class BmpReader {
 		boolean topToBottom;
 		int bitsPerPixel;
 		int compression;
-		int imageSize;
 		int colorsUsed;
 		BmpImage bmp = new BmpImage();
 		if (headerSize == 40) {
@@ -37,7 +36,7 @@ public final class BmpReader {
 			planes = readInt16(in);
 			bitsPerPixel = readInt16(in);
 			compression = readInt32(in);
-			imageSize = readInt32(in);
+			readInt32(in);  // imageSize
 			bmp.horizontalResolution = readInt32(in);
 			bmp.verticalResolution   = readInt32(in);
 			colorsUsed = readInt32(in);
@@ -64,16 +63,12 @@ public final class BmpReader {
 				throw new RuntimeException("Unsupported bits per pixel: " + bitsPerPixel);
 			
 			if (compression == 0) {
-				if (imageSize == 0)
-					imageSize = (width * bitsPerPixel + 31) / 32 * 4 * height;
 			} else if (bitsPerPixel == 8 && compression == 1 || bitsPerPixel == 4 && compression == 2) {
 				if (topToBottom)
 					throw new RuntimeException("Top-to-bottom order not supported for compression = 1 or 2");
 			} else
 				throw new RuntimeException("Unsupported compression: " + compression);
 			
-			if (imageSize != (width * bitsPerPixel + 31) / 32 * 4 * height)
-				throw new RuntimeException("Invalid image size: " + imageSize);
 			if (colorsImportant < 0 || colorsImportant > colorsUsed)
 				throw new RuntimeException("Invalid important colors: " + colorsImportant);
 			
@@ -105,7 +100,6 @@ public final class BmpReader {
 				bmp.image = readRleImage(in, width, height, bitsPerPixel, palette);
 		}
 		
-		skipFully(in, fileSize - (imageDataOffset + imageSize));
 		return bmp;
 	}
 	
