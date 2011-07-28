@@ -77,6 +77,7 @@ public final class BmpReader {
 			throw new RuntimeException("Invalid file size: " + fileSize);
 		
 		// Read the image data
+		skipFully(in, imageDataOffset - (14 + headerSize + 4 * colorsUsed));
 		if (bitsPerPixel == 24 || bitsPerPixel == 32)
 			bmp.image = readRgb24Or32Image(in, width, height, bitsPerPixel);
 		
@@ -91,6 +92,7 @@ public final class BmpReader {
 			bmp.image = readPalettedImage(in, width, height, bitsPerPixel, palette);
 		}
 		
+		skipFully(in, fileSize - (imageDataOffset + imageSize));
 		return bmp;
 	}
 	
