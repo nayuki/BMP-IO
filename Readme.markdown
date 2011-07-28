@@ -12,6 +12,7 @@ Supported reading formats:
 * Paletted 1-bit
 * Paletted 4-bit
 * Paletted 8-bit
+* Paletted 8-bit with RLE compression
 * RGB 8,8,8
 * RGBA 8,8,8,8
 
