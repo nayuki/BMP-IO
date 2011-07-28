@@ -21,6 +21,7 @@ public final class BmpReader {
 		int headerSize = readInt32(in);
 		int width;
 		int height;
+		boolean topToBottom;
 		int bitsPerPixel;
 		int imageSize;
 		int colorsUsed;
@@ -31,6 +32,8 @@ public final class BmpReader {
 			int colorsImportant;
 			width  = readInt32(in);
 			height = readInt32(in);
+			topToBottom = height < 0;
+			height = Math.abs(height);
 			planes = readInt16(in);
 			bitsPerPixel = readInt16(in);
 			compression = readInt32(in);
@@ -42,7 +45,7 @@ public final class BmpReader {
 			
 			if (width <= 0)
 				throw new RuntimeException("Invalid width: " + width);
-			if (height <= 0)
+			if (height == 0)
 				throw new RuntimeException("Invalid height: " + height);
 			if (planes != 1)
 				throw new RuntimeException("Unsupported planes: " + planes);
@@ -79,7 +82,7 @@ public final class BmpReader {
 		// Read the image data
 		skipFully(in, imageDataOffset - (14 + headerSize + 4 * colorsUsed));
 		if (bitsPerPixel == 24 || bitsPerPixel == 32)
-			bmp.image = readRgb24Or32Image(in, width, height, bitsPerPixel);
+			bmp.image = readRgb24Or32Image(in, width, height, topToBottom, bitsPerPixel);
 		
 		else {
 			int[] palette = new int[colorsUsed];
@@ -89,7 +92,7 @@ public final class BmpReader {
 				palette[i] = (entry[2] & 0xFF) << 16 | (entry[1] & 0xFF) << 8 | (entry[0] & 0xFF);
 			}
 			
-			bmp.image = readPalettedImage(in, width, height, bitsPerPixel, palette);
+			bmp.image = readPalettedImage(in, width, height, topToBottom, bitsPerPixel, palette);
 		}
 		
 		skipFully(in, fileSize - (imageDataOffset + imageSize));
@@ -97,11 +100,23 @@ public final class BmpReader {
 	}
 	
 	
-	private static Rgb888Image readRgb24Or32Image(InputStream in, int width, int height, int bitsPerPixel) throws IOException {
+	private static Rgb888Image readRgb24Or32Image(InputStream in, int width, int height, boolean topToBottom, int bitsPerPixel) throws IOException {
 		BufferedRgb888Image image = new BufferedRgb888Image(width, height);
 		int bytesPerPixel = bitsPerPixel / 8;
 		byte[] row = new byte[(width * bytesPerPixel + 3) / 4 * 4];
-		for (int y = height - 1; y >= 0; y--) {
+		
+		int y, end, inc;
+		if (topToBottom) {
+			y = 0;
+			end = height;
+			inc = 1;
+		} else {
+			y = height - 1;
+			end = -1;
+			inc = -1;
+		}
+		
+		for (; y != end; y += inc) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++) {
 				int color =   (row[x * bytesPerPixel + 2] & 0xFF) << 16
@@ -114,12 +129,24 @@ public final class BmpReader {
 	}
 	
 	
-	private static Rgb888Image readPalettedImage(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
+	private static Rgb888Image readPalettedImage(InputStream in, int width, int height, boolean topToBottom, int bitsPerPixel, int[] palette) throws IOException {
 		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
 		byte[] row = new byte[(width * bitsPerPixel + 31) / 32 * 4];
 		int pixelsPerByte = 8 / bitsPerPixel;
 		int mask = (1 << bitsPerPixel) - 1;
-		for (int y = height - 1; y >= 0; y--) {
+		
+		int y, end, inc;
+		if (topToBottom) {
+			y = 0;
+			end = height;
+			inc = 1;
+		} else {
+			y = height - 1;
+			end = -1;
+			inc = -1;
+		}
+		
+		for (; y != end; y += inc) {
 			readFully(in, row);
 			for (int x = 0; x < width; x++) {
 				int index = x / pixelsPerByte;
