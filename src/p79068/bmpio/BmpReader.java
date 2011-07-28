@@ -66,9 +66,9 @@ public final class BmpReader {
 			if (compression == 0) {
 				if (imageSize == 0)
 					imageSize = (width * bitsPerPixel + 31) / 32 * 4 * height;
-			} else if (compression == 1 && bitsPerPixel == 8) {
+			} else if (bitsPerPixel == 8 && compression == 1 || bitsPerPixel == 4 && compression == 2) {
 				if (topToBottom)
-					throw new RuntimeException("Top-to-bottom order not supported for compression=1");
+					throw new RuntimeException("Top-to-bottom order not supported for compression = 1 or 2");
 			} else
 				throw new RuntimeException("Unsupported compression: " + compression);
 			
@@ -102,7 +102,7 @@ public final class BmpReader {
 			if (compression == 0)
 				bmp.image = readPalettedImage(in, width, height, topToBottom, bitsPerPixel, palette);
 			else
-				bmp.image = readRle8Image(in, width, height, palette);
+				bmp.image = readRleImage(in, width, height, bitsPerPixel, palette);
 		}
 		
 		skipFully(in, fileSize - (imageDataOffset + imageSize));
@@ -168,11 +168,11 @@ public final class BmpReader {
 	}
 	
 	
-	private static Rgb888Image readRle8Image(InputStream in, int width, int height, int[] palette) throws IOException {
+	private static Rgb888Image readRleImage(InputStream in, int width, int height, int bitsPerPixel, int[] palette) throws IOException {
 		BufferedPalettedRgb888Image image = new BufferedPalettedRgb888Image(width, height, palette);
 		int x = 0;
 		int y = height - 1;
-		while (y >= 0) {
+		while (true) {
 			byte[] b = new byte[2];
 			readFully(in, b);
 			if (b[0] == 0) {  // Special
@@ -187,31 +187,36 @@ public final class BmpReader {
 					y -= b[1] & 0xFF;
 					if (x >= width)
 						throw new IndexOutOfBoundsException("x coordinate out of bounds");
+				
 				} else {  // Literal run
 					int n = b[1] & 0xFF;
-					b = new byte[(n + 1) / 2 * 2];  // Round up to multiple of 2
+					b = new byte[(n * bitsPerPixel + 15) / 16 * 2];  // Round up to multiple of 2 bytes
 					readFully(in, b);
 					for (int i = 0; i < n; i++, x++) {
-						if (x == width) {
-							x = 0;
-							y--;
-							if (y < 0)
-								throw new IndexOutOfBoundsException("Data exceeds image bounds");
-						}
-						image.setRgb888Pixel(x, y, b[i]);
+						if (x == width)  // Ignore image data past end of line
+							break;
+						
+						if (bitsPerPixel == 8)
+							image.setRgb888Pixel(x, y, b[i]);
+						else if (bitsPerPixel == 4)
+							image.setRgb888Pixel(x, y, (byte)(b[i / 2] >>> ((1 - i % 2) * 4) & 0xF));
+						else
+							throw new AssertionError();
 					}
 				}
 				
 			} else {  // Run
 				int n = b[0] & 0xFF;
 				for (int i = 0; i < n; i++, x++) {
-					if (x == width) {
-						x = 0;
-						y--;
-						if (y < 0)
-							throw new IndexOutOfBoundsException("Data exceeds image bounds");
-					}
-					image.setRgb888Pixel(x, y, b[1]);
+					if (x == width)  // Ignore image data past end of line
+						break;
+					
+					if (bitsPerPixel == 8)
+						image.setRgb888Pixel(x, y, b[1]);
+					else if (bitsPerPixel == 4)
+						image.setRgb888Pixel(x, y, (byte)(b[1] >>> ((1 - i % 2) * 4) & 0xF));
+					else
+						throw new AssertionError();
 				}
 			}
 		}
