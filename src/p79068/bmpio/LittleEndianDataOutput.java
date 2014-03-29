@@ -29,7 +29,7 @@ final class LittleEndianDataOutput {
 	
 	
 	public void writeInt32(int x) throws IOException {
-		out.writeInt((x & 0xFF) << 24 | (x & 0xFF00) << 8 | (x & 0xFF0000) >>> 8 | (x & 0xFF000000) >>> 24);
+		out.writeInt(Integer.reverseBytes(x));
 	}
 	
 	
