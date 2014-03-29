@@ -218,4 +218,8 @@ public final class BmpReader {
 		return image;
 	}
 	
+	
+	// Not instantiable
+	private BmpReader() {}
+	
 }

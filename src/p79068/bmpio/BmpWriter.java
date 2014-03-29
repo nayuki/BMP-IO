@@ -50,4 +50,8 @@ public final class BmpWriter {
 		out1.flush();
 	}
 	
+	
+	// Not instantiable
+	private BmpWriter() {}
+	
 }
