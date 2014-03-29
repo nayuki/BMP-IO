@@ -10,6 +10,17 @@ public final class SimpleDemo {
 	public static void main(String[] args) throws IOException {
 		File file = new File("Demo.bmp");
 		
+		/* 
+		 * A colorful test image (512 x 576):
+		 *   
+		 *   [black, red, green, blue, yellow, cyan, magenta, white squares at 64x64]
+		 *   
+		 *   [  black-gray-white   ] [black-red-green-yellow]
+		 *   [ gradient at 256x256 ] [ gradient at 256x256  ]
+		 *   
+		 *   [black-green-blue-cyan] [black-blue-red-magenta]
+		 *   [ gradient at 256x256 ] [ gradient at 256x256  ]
+		 */
 		Rgb888Image image = new Rgb888Image() {
 			public int getWidth() {
 				return 512;
