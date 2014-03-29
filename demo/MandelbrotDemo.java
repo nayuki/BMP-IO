@@ -14,8 +14,11 @@ public final class MandelbrotDemo {
 		
 		File file = new File("Mandelbrot.bmp");
 		FileOutputStream out = new FileOutputStream(file);
-		BmpWriter.write(out, bmp);
-		out.close();
+		try {
+			BmpWriter.write(out, bmp);
+		} finally {
+			out.close();
+		}
 	}
 	
 }

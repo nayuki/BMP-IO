@@ -44,8 +44,11 @@ public final class SimpleDemo {
 		BmpImage bmp = new BmpImage();
 		bmp.image = image;
 		FileOutputStream out = new FileOutputStream(file);
-		BmpWriter.write(out, bmp);
-		out.close();
+		try {
+			BmpWriter.write(out, bmp);
+		} finally {
+			out.close();
+		}
 	}
 	
 }
