@@ -18,7 +18,7 @@ public final class SimpleDemo {
 			public int getHeight() {
 				return 64 + 512;
 			}
-		
+			
 			public int getRgb888Pixel(int x, int y) {
 				if (y < 64)
 					return (new int[]{0x000000, 0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0x00FFFF, 0xFF00FF, 0xFFFFFF})[x / 64];
