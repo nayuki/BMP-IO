@@ -1,10 +1,10 @@
-import p79068.bmpio.Rgb888Image;
+import p79068.bmpio.AbstractRgb888Image;
 
 
 /**
  * The Mandelbrot set as an Rgb888Image. This shows that an image does not need to be explicitly stored; its pixels can be computed on the fly.
  */
-final class MandelbrotImage implements Rgb888Image {
+final class MandelbrotImage extends AbstractRgb888Image {
 	
 	private double xMin = -1.9;
 	private double xMax =  0.5;
@@ -13,26 +13,12 @@ final class MandelbrotImage implements Rgb888Image {
 	
 	private int iterations = 1000;
 	
-	private int width;
-	private int height;
-	
 	
 	
 	public MandelbrotImage(int width, int height) {
-		this.width = width;
-		this.height = height;
+		super(width, height);
 	}
 	
-	
-	
-	public int getWidth() {
-		return width;
-	}
-	
-	
-	public int getHeight() {
-		return height;
-	}
 	
 	
 	public int getRgb888Pixel(int x, int y) {

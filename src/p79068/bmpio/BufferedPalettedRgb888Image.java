@@ -1,11 +1,7 @@
 package p79068.bmpio;
 
 
-public final class BufferedPalettedRgb888Image implements Rgb888Image {
-	
-	private int width;
-	
-	private int height;
+public final class BufferedPalettedRgb888Image extends AbstractRgb888Image {
 	
 	private int[] palette;
 	
@@ -14,22 +10,11 @@ public final class BufferedPalettedRgb888Image implements Rgb888Image {
 	
 	
 	public BufferedPalettedRgb888Image(int width, int height, int[] palette) {
-		this.width = width;
-		this.height = height;
+		super(width, height);
 		this.palette = palette.clone();
 		pixels = new byte[width * height];
 	}
 	
-	
-	
-	public int getWidth() {
-		return width;
-	}
-	
-	
-	public int getHeight() {
-		return height;
-	}
 	
 	
 	public int getRgb888Pixel(int x, int y) {

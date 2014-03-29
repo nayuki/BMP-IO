@@ -21,15 +21,7 @@ public final class SimpleDemo {
 		 *   [black-green-blue-cyan] [black-blue-red-magenta]
 		 *   [ gradient at 256x256 ] [ gradient at 256x256  ]
 		 */
-		Rgb888Image image = new Rgb888Image() {
-			public int getWidth() {
-				return 512;
-			}
-			
-			public int getHeight() {
-				return 64 + 512;
-			}
-			
+		Rgb888Image image = new AbstractRgb888Image(512, 64 + 512) {
 			public int getRgb888Pixel(int x, int y) {
 				if (y < 64)
 					return (new int[]{0x000000, 0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0x00FFFF, 0xFF00FF, 0xFFFFFF})[x / 64];

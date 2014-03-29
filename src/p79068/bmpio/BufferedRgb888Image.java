@@ -1,32 +1,17 @@
 package p79068.bmpio;
 
 
-public final class BufferedRgb888Image implements Rgb888Image {
-	
-	private int width;
-	
-	private int height;
+public final class BufferedRgb888Image extends AbstractRgb888Image {
 	
 	private int[] pixels;
 	
 	
 	
 	public BufferedRgb888Image(int width, int height) {
-		this.width = width;
-		this.height = height;
+		super(width, height);
 		pixels = new int[width * height];
 	}
 	
-	
-	
-	public int getWidth() {
-		return width;
-	}
-	
-	
-	public int getHeight() {
-		return height;
-	}
 	
 	
 	public int getRgb888Pixel(int x, int y) {
