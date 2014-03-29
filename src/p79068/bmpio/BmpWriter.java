@@ -16,7 +16,7 @@ public final class BmpWriter {
 		int imageSize = rowSize * height;
 		
 		// BITMAPFILEHEADER
-		out1.writeBytes(new byte[]{'B', 'M'}, 0, 2);  // FileType
+		out1.writeBytes(new byte[]{'B', 'M'});        // FileType
 		out1.writeInt32(14 + 40 + imageSize);         // FileSize
 		out1.writeInt16(0);                           // Reserved1
 		out1.writeInt16(0);                           // Reserved2
@@ -44,7 +44,7 @@ public final class BmpWriter {
 				row[x * 3 + 1] = (byte)(color >>>  8);  // Green
 				row[x * 3 + 2] = (byte)(color >>> 16);  // Red
 			}
-			out1.writeBytes(row, 0, row.length);
+			out1.writeBytes(row);
 		}
 		
 		out1.flush();

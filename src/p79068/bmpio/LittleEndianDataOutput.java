@@ -17,11 +17,12 @@ final class LittleEndianDataOutput {
 	
 	
 	
-	public void writeBytes(byte[] b, int off, int len) throws IOException {
+	public void writeBytes(byte[] b) throws IOException {
 		out.write(b);
 	}
 	
 	
+	// The top 16 bits are ignored
 	public void writeInt16(int x) throws IOException {
 		out.writeShort((x & 0xFF) << 8 | (x & 0xFF00) >>> 8);
 	}
