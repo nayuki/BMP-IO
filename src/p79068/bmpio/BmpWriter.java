@@ -16,11 +16,11 @@ public final class BmpWriter {
 		int imageSize = rowSize * height;
 		
 		// BITMAPFILEHEADER
-		out1.writeBytes(new byte[]{'B', 'M'});        // FileType
-		out1.writeInt32(14 + 40 + imageSize);         // FileSize
-		out1.writeInt16(0);                           // Reserved1
-		out1.writeInt16(0);                           // Reserved2
-		out1.writeInt32(14 + 40);                     // BitmapOffset
+		out1.writeBytes(new byte[]{'B', 'M'});  // FileType
+		out1.writeInt32(14 + 40 + imageSize);   // FileSize
+		out1.writeInt16(0);                     // Reserved1
+		out1.writeInt16(0);                     // Reserved2
+		out1.writeInt32(14 + 40);               // BitmapOffset
 		
 		// BITMAPINFOHEADER
 		out1.writeInt32(40);                        // Size
