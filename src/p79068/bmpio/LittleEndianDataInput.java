@@ -1,6 +1,9 @@
 package p79068.bmpio;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 final class LittleEndianDataInput {
