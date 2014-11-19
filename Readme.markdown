@@ -39,7 +39,8 @@ Full listing of demos:
 License
 -------
 
-Copyright © 2011 Nayuki Minase
+Copyright © 2014 Project Nayuki  
+[http://www.nayuki.io/page/bmp-io-library-java](http://www.nayuki.io/page/bmp-io-library-java)
 
 (MIT License)
 
