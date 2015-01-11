@@ -9,6 +9,8 @@ public final class BufferedRgb888Image extends AbstractRgb888Image {
 	
 	public BufferedRgb888Image(int width, int height) {
 		super(width, height);
+		if (width > Integer.MAX_VALUE / height)
+			throw new IllegalArgumentException("Image dimensions too large");
 		pixels = new int[width * height];
 	}
 	

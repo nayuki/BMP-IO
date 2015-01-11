@@ -11,6 +11,8 @@ public final class BufferedPalettedRgb888Image extends AbstractRgb888Image {
 	
 	public BufferedPalettedRgb888Image(int width, int height, int[] palette) {
 		super(width, height);
+		if (width > Integer.MAX_VALUE / height)
+			throw new IllegalArgumentException("Image dimensions too large");
 		this.palette = palette.clone();
 		pixels = new byte[width * height];
 	}
