@@ -40,7 +40,7 @@ License
 -------
 
 Copyright © 2014 Project Nayuki  
-[http://www.nayuki.io/page/bmp-io-library-java](http://www.nayuki.io/page/bmp-io-library-java)
+[https://www.nayuki.io/page/bmp-io-library-java](https://www.nayuki.io/page/bmp-io-library-java)
 
 (MIT License)
 
