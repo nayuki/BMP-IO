@@ -23,9 +23,8 @@ public final class MandelbrotDemo {
 	
 	
 	
-	/**
-	 * The Mandelbrot set as an Rgb888Image. This shows that an image does not need to be explicitly stored; its pixels can be computed on the fly.
-	 */
+	// Represents an image of the Mandelbrot set. This shows that an image object does not
+	// need to store pixel data explicitly; the pixel values can be computed on the fly.
 	private final static class MandelbrotImage extends AbstractRgb888Image {
 		
 		private double xMin = -1.9;
@@ -44,21 +43,20 @@ public final class MandelbrotDemo {
 		
 		
 		public int getRgb888Pixel(int x, int y) {
-			if (isInMandelbrotSet(xMin + (x + 0.5) / width * (xMax - xMin), yMax - (y + 0.5) / height * (yMax - yMin)))
-				return 0x000000;
-			else
-				return 0xFFFFFF;
+			double real = xMin + (x + 0.5) / width  * (xMax - xMin);
+			double imag = yMax - (y + 0.5) / height * (yMax - yMin);
+			return isInMandelbrotSet(real, imag) ? 0x000000 : 0xFFFFFF;
 		}
 		
 		
-		private boolean isInMandelbrotSet(double x, double y) {
+		private boolean isInMandelbrotSet(double real, double imag) {
 			double zr = 0;
 			double zi = 0;
 			for (int i = 0; i < iterations; i++) {
 				if (zr * zr + zi * zi > 4)
 					return false;
-				double temp = zr * zr - zi * zi + x;
-				zi = 2 * zr * zi + y;
+				double temp = zr * zr - zi * zi + real;
+				zi = 2 * zr * zi + imag;
 				zr = temp;
 			}
 			return true;
