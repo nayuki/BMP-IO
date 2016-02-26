@@ -5,10 +5,11 @@ BMP I/O
 Introduction
 ------------
 
-**BMP I/O** is a lightweight Java library for reading and writing Windows BMP files.
+**BMP I/O** is a lightweight Java library for reading and writing image files in the Windows BMP format.
 
 Supported reading formats:
 
+* BITMAPINFOHEADER header
 * Paletted 1-bit
 * Paletted 4-bit
 * Paletted 4-bit with RLE compression
@@ -16,30 +17,31 @@ Supported reading formats:
 * Paletted 8-bit with RLE compression
 * RGB 8,8,8
 * RGBA 8,8,8,8
-
-Bitmap files with image data in bottom-to-top order (common) and top-to-bottom order (unusual) are supported.
+* Rows in bottom-to-top order (common)
+* Rows in top-to-bottom order (uncommon)
 
 Supported writing formats:
 
 * RGB 8,8,8
+* Rows in bottom-to-top order
 
 
-Demo
-----
+Demos
+-----
 
-In the `demo` directory, run the class `SimpleDemo` with the command `java SimpleDemo`. It will create a sample file `Demo.bmp` in the current directory.
-
-Full listing of demos:
+In the demo directory, run any one of these classes with zero command-line arguments, and it will create a sample .bmp file in the current directory:
 
 * SimpleDemo: Draws a square for each of the 8 extreme colors, and four 2D gradient squares. This shows that the image is in true color (rather than paletted 256-color, etc.).
+
 * MandelbrotDemo: Draws a black-and-white image of the main part of the Mandelbrot set. The image is computed on the fly when each pixel is being requested for writing.
-* ReadDemo: Reads Demo.bmp (which can be in any color format) and writes Demo2.bmp with the same image contents but in RGB 8,8,8 true color.
+
+* ReadDemo: Reads from Demo.bmp (which can be in any color format) and writes to Demo2.bmp with the same image contents but in RGB 8,8,8 true color.
 
 
 License
 -------
 
-Copyright © 2014 Project Nayuki  
+Copyright © 2016 Project Nayuki  
 [https://www.nayuki.io/page/bmp-io-library-java](https://www.nayuki.io/page/bmp-io-library-java)
 
 (MIT License)
