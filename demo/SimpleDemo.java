@@ -7,6 +7,7 @@ import p79068.bmpio.*;
 
 public final class SimpleDemo {
 	
+	// Run with zero command-line arguments. This program writes Demo.bmp to the current directory.
 	public static void main(String[] args) throws IOException {
 		File file = new File("Demo.bmp");
 		

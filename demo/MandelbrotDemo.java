@@ -8,6 +8,7 @@ import p79068.bmpio.BmpWriter;
 
 public final class MandelbrotDemo {
 	
+	// Run with zero command-line arguments. This program writes Mandelbrot.bmp to the current directory.
 	public static void main(String[] args) throws IOException {
 		BmpImage bmp = new BmpImage();
 		bmp.image = new MandelbrotImage(512, 512);

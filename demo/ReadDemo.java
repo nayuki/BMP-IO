@@ -11,6 +11,7 @@ import p79068.bmpio.BmpWriter;
 
 public final class ReadDemo {
 	
+	// Run with zero command-line arguments. This program reads Demo.bmp and writes Demo2.bmp in the current directory.
 	public static void main(String[] args) throws IOException {
 		InputStream in = new FileInputStream("Demo.bmp");
 		BmpImage bmp;
