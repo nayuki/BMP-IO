@@ -1,4 +1,4 @@
-package p79068.bmpio;
+package io.nayuki.bmpio;
 
 
 public final class BufferedRgb888Image extends AbstractRgb888Image {

@@ -1,8 +1,10 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import p79068.bmpio.*;
+import io.nayuki.bmpio.AbstractRgb888Image;
+import io.nayuki.bmpio.BmpImage;
+import io.nayuki.bmpio.BmpWriter;
+import io.nayuki.bmpio.Rgb888Image;
 
 
 public final class SimpleDemo {

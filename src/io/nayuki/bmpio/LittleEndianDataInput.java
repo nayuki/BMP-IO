@@ -1,4 +1,4 @@
-package p79068.bmpio;
+package io.nayuki.bmpio;
 
 import java.io.DataInputStream;
 import java.io.EOFException;

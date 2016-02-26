@@ -1,4 +1,4 @@
-package p79068.bmpio;
+package io.nayuki.bmpio;
 
 
 public interface Rgb888Image {

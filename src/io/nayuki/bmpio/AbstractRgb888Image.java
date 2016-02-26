@@ -1,4 +1,4 @@
-package p79068.bmpio;
+package io.nayuki.bmpio;
 
 
 // A convenience base class with width and height fields and getters.
